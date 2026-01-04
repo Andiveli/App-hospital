@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            tools:text="Cita #123"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <TextView
+            android:id="@+id/tvDiaHora"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_schedule"
+            android:drawablePadding="8dp"
+            tools:text="LUNES a las 14:30"
+            app:layout_constraintTop_toBottomOf="@id/tvId"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <TextView
+            android:id="@+id/tvPaciente"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:layout_marginTop="4dp"
+            android:drawablePadding="8dp"
+            tools:text="👤 paciente@email.com"
+            app:layout_constraintTop_toBottomOf="@id/tvDiaHora"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <TextView
+            android:id="@+id/tvMedico"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:layout_marginTop="4dp"
+            android:drawablePadding="8dp"
+            tools:text="👨‍⚕️ medico@email.com"
+            app:layout_constraintTop_toBottomOf="@id/tvPaciente"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <TextView
+            android:id="@+id/tvEstado"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#2196F3"
+            android:layout_marginTop="4dp"
+            android:drawablePadding="8dp"
+            tools:text="📅 Programada"
+            app:layout_constraintTop_toBottomOf="@id/tvMedico"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <!-- Contenedor de botones de acción -->
+        <LinearLayout
+            android:id="@+id/llBotones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageButton
+                android:id="@+id/btnCancelar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_cancel"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Cancelar cita"
+                android:tint="#FF9800"
+                android:layout_marginBottom="2dp" />
+
+            <ImageButton
+                android:id="@+id/btnAtender"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_check_circle"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Marcar como atendida"
+                android:tint="#4CAF50"
+                android:layout_marginBottom="2dp" />
+
+            <ImageButton
+                android:id="@+id/btnEliminar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_delete"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Eliminar cita"
+                android:tint="#F44336" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

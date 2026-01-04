@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.hospital.ui.patient.PacienteActivity;
 import com.example.hospital.ui.medico.MedicoActivity;
+import com.example.hospital.ui.cita.CitaActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,8 +61,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Botón Citas
         findViewById(R.id.btnCitas).setOnClickListener(v -> {
-            mostrarMensaje("Citas: Próximamente... 🏗️");
-            Toast.makeText(this, "Módulo de Citas en desarrollo", Toast.LENGTH_SHORT).show();
+            mostrarLoading(true);
+            startActivity(new Intent(this, CitaActivity.class));
+            mostrarLoading(false);
         });
 
         // Botón Tratamientos
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void mostrarMensajeBienvenida() {
-        mostrarMensaje("🏥 Sistema de Hospital - Módulos: Pacientes ✅ Médicos ✅");
+        mostrarMensaje("🏥 Sistema de Hospital - Módulos: Pacientes ✅ Médicos ✅ Citas ✅");
     }
 
     private void mostrarLoading(boolean show) {
