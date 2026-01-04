@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvNombreCompleto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            tools:text="Juan Pérez"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnEliminar" />
+
+        <TextView
+            android:id="@+id/tvCedula"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_person"
+            android:drawablePadding="8dp"
+            tools:text="Cédula: 12345678"
+            app:layout_constraintTop_toBottomOf="@id/tvNombreCompleto"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnEliminar" />
+
+        <TextView
+            android:id="@+id/tvCorreo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_email"
+            android:drawablePadding="8dp"
+            tools:text="juan@email.com"
+            app:layout_constraintTop_toBottomOf="@id/tvCedula"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnEliminar" />
+
+        <TextView
+            android:id="@+id/tvSeguro"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#2196F3"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_health"
+            android:drawablePadding="8dp"
+            tools:text="Seguro: PRIVADO"
+            app:layout_constraintTop_toBottomOf="@id/tvCorreo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnEliminar" />
+
+        <ImageButton
+            android:id="@+id/btnEliminar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Eliminar paciente"
+            android:tint="#F44336"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

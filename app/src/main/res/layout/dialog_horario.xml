@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Configurar Horario de Atención"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:hint="Hora Inicio"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etHoraInicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="time"
+                android:text="08:00" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:hint="Hora Fin"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etHoraFin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="time"
+                android:text="17:00" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Días de atención:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <CheckBox
+        android:id="@+id/cbLunes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lunes"
+        android:checked="true" />
+
+    <CheckBox
+        android:id="@+id/cbMartes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Martes"
+        android:checked="true" />
+
+    <CheckBox
+        android:id="@+id/cbMiercoles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Miércoles"
+        android:checked="true" />
+
+    <CheckBox
+        android:id="@+id/cbJueves"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Jueves"
+        android:checked="true" />
+
+    <CheckBox
+        android:id="@+id/cbViernes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Viernes"
+        android:checked="true" />
+
+    <CheckBox
+        android:id="@+id/cbSabado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sábado"
+        android:checked="false" />
+
+    <CheckBox
+        android:id="@+id/cbDomingo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Domingo"
+        android:checked="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Duración de cita (minutos):"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Duración"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etDuracionCita"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:text="60" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <RadioGroup
+        android:id="@+id/rgDias"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <!-- Este RadioGroup queda como placeholder por ahora -->
+
+    </RadioGroup>
+
+</LinearLayout>

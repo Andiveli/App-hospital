@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvNombreCompleto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            tools:text="Dr. Juan Pérez"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <TextView
+            android:id="@+id/tvCedula"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_person"
+            android:drawablePadding="8dp"
+            tools:text="Cédula: 12345678"
+            app:layout_constraintTop_toBottomOf="@id/tvNombreCompleto"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <TextView
+            android:id="@+id/tvCorreo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_email"
+            android:drawablePadding="8dp"
+            tools:text="juan@email.com"
+            app:layout_constraintTop_toBottomOf="@id/tvCedula"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <TextView
+            android:id="@+id/tvEspecialidad"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#2196F3"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_health"
+            android:drawablePadding="8dp"
+            tools:text="Especialidad: Cardiología"
+            app:layout_constraintTop_toBottomOf="@id/tvCorreo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <TextView
+            android:id="@+id/tvGenero"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#757575"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_person"
+            android:drawablePadding="8dp"
+            tools:text="Género: Masculino"
+            app:layout_constraintTop_toBottomOf="@id/tvEspecialidad"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <TextView
+            android:id="@+id/tvEstado"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#4CAF50"
+            android:layout_marginTop="4dp"
+            android:drawablePadding="8dp"
+            tools:text="✅ Activo"
+            app:layout_constraintTop_toBottomOf="@id/tvGenero"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llBotones" />
+
+        <!-- Contenedor de botones -->
+        <LinearLayout
+            android:id="@+id/llBotones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageButton
+                android:id="@+id/btnToggleStatus"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_play_arrow"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Cambiar estado"
+                android:tint="#FF9800"
+                android:layout_marginBottom="4dp" />
+
+            <ImageButton
+                android:id="@+id/btnEliminar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_delete"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Eliminar médico"
+                android:tint="#F44336" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
