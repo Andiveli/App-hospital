@@ -9,7 +9,7 @@ public class Medicacion extends Tratamiento {
 
     @Override
     public String getTipo() {
-        return "medicacion";
+        return "Medicación";
     }
     
     @Override

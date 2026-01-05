@@ -9,11 +9,13 @@ public abstract class Tratamiento implements Serializable {
     private String nombre;
     private int duracion;
     private double precio;
+    private int id;
 
     public Tratamiento(String nombre, int duracion, double precio) {
         this.nombre = nombre;
         this.duracion = duracion;
         this.precio = precio;
+        this.id = 0; // Se asignará después
     }   
 
     public static double getCostoBase() {
@@ -30,6 +32,14 @@ public abstract class Tratamiento implements Serializable {
 
     public int getDuracion() {
         return duracion;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setnuevoId(int id) {
+        this.id = id;
     }
 
     public double pagar() {

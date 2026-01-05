@@ -38,6 +38,12 @@
             android:exported="false"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.Hospital" />
+        
+        <activity
+            android:name=".ui.tratamiento.TratamientoActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.Hospital" />
     </application>
 
 </manifest>
