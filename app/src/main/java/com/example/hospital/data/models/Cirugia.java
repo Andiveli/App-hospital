@@ -15,7 +15,7 @@ public class Cirugia extends Tratamiento {
     @Override
     public double calcularCosto() {
         double costoBase = getCostoBase();
-        double recargo = 0.25 * getPrecio(); // Recargo del 25% para cirugías
+        double recargo = 1.25 * getPrecio(); // Recargo del 25% para cirugías
         return costoBase + recargo;
     }
 

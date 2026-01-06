@@ -17,6 +17,7 @@ import com.example.hospital.ui.patient.PacienteActivity;
 import com.example.hospital.ui.medico.MedicoActivity;
 import com.example.hospital.ui.cita.CitaActivity;
 import com.example.hospital.ui.tratamiento.TratamientoActivity;
+import com.example.hospital.ui.reporte.ReporteActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -76,13 +77,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Botón Reportes
         findViewById(R.id.btnReportes).setOnClickListener(v -> {
-            mostrarMensaje("Reportes: Próximamente... 🏗️");
-            Toast.makeText(this, "Módulo de Reportes en desarrollo", Toast.LENGTH_SHORT).show();
+            mostrarLoading(true);
+            startActivity(new Intent(this, ReporteActivity.class));
+            mostrarLoading(false);
         });
     }
 
     private void mostrarMensajeBienvenida() {
-        mostrarMensaje("🏥 Sistema de Hospital - Módulos: Pacientes ✅ Médicos ✅ Citas ✅ Tratamientos ✅");
+        mostrarMensaje("🏥 Sistema de Hospital - Módulos: Pacientes ✅ Médicos ✅ Citas ✅ Tratamientos ✅ Reportes ✅");
     }
 
     private void mostrarLoading(boolean show) {
