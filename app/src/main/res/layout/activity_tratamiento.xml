@@ -53,7 +53,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Campo para correo del paciente -->
+        <!-- Campo para correo del paciente con Autocomplete -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilCorreoPaciente"
             android:layout_width="0dp"
@@ -65,7 +65,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <AutoCompleteTextView
                 android:id="@+id/etCorreoPaciente"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -80,8 +80,8 @@
             android:text="Tipo de tratamiento:"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="2dp"
             app:layout_constraintTop_toBottomOf="@id/tilCorreoPaciente"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -91,7 +91,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="16dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="12dp"
             app:layout_constraintTop_toBottomOf="@id/tvLabelTipo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">

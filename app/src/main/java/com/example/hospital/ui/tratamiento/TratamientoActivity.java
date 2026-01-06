@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -20,6 +23,7 @@ import com.example.hospital.MainActivity;
 import com.example.hospital.R;
 import com.example.hospital.data.models.Paciente;
 import com.example.hospital.data.models.TratamientoPaciente;
+import com.example.hospital.data.repository.PacienteRepository;
 import com.example.hospital.viewmodel.TratamientoPacienteViewModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -29,7 +33,7 @@ import java.util.List;
 public class TratamientoActivity extends AppCompatActivity implements TratamientoAdapter.OnTratamientoClickListener {
 
     // UI Components
-    private TextInputEditText etCorreoPaciente;
+    private AutoCompleteTextView etCorreoPaciente;
     private TextInputEditText etNombreTratamiento;
     private TextInputEditText etCostoUnidad, etVecesDia, etDias;
     private TextInputEditText etCostoCirugia;
@@ -49,6 +53,10 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
     // ViewModel y Adapter
     private TratamientoPacienteViewModel tratamientoViewModel;
     private TratamientoAdapter tratamientoAdapter;
+    
+    // Repositorio y adapter para autocomplete
+    private PacienteRepository pacienteRepository;
+    private ArrayAdapter<String> pacienteAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +65,9 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
 
         initViews();
         setupViewModel();
+        setupRepositories();
         setupRecyclerView();
+        setupAutocomplete();
         setupClickListeners();
         setupTipoTratamientoListener();
         
@@ -107,6 +117,42 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
         tratamientoViewModel.getMensaje().observe(this, this::mostrarMensaje);
         tratamientoViewModel.getLoading().observe(this, this::mostrarLoading);
         tratamientoViewModel.getPacienteActual().observe(this, this::actualizarPacienteActual);
+    }
+
+    private void setupRepositories() {
+        pacienteRepository = new PacienteRepository(this);
+    }
+
+    private void setupAutocomplete() {
+        // Configurar adapter para pacientes
+        pacienteAdapter = new ArrayAdapter<>(this, 
+            android.R.layout.simple_dropdown_item_1line);
+        etCorreoPaciente.setAdapter(pacienteAdapter);
+        
+        // Cargar datos para autocomplete
+        cargarAutocompleteData();
+        
+        // Configurar listener para cuando se seleccione un paciente
+        etCorreoPaciente.setOnItemClickListener((parent, view, position, id) -> {
+            String seleccionado = (String) parent.getItemAtPosition(position);
+            // Extraer el correo del formato "Nombre Apellido (correo@ejemplo.com)"
+            String correoExtraido = extraerCorreo(seleccionado);
+            
+            // Al seleccionar un paciente, limpiar el formulario para facilitar nueva entrada
+            limpiarFormularioExceptoCorreo();
+            etCorreoPaciente.setText(correoExtraido);
+        });
+    }
+
+    private void cargarAutocompleteData() {
+        // Cargar pacientes
+        List<Paciente> pacientes = pacienteRepository.getAllPacientes();
+        pacienteAdapter.clear();
+        for (Paciente paciente : pacientes) {
+            // Solo agregar "Nombre Apellido (correo)" para mostrar más información
+            pacienteAdapter.add(paciente.getNombre() + " " + paciente.getApellido() + " (" + paciente.getCorreo() + ")");
+        }
+        pacienteAdapter.notifyDataSetChanged();
     }
 
     private void setupRecyclerView() {
@@ -291,19 +337,27 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
         }
     }
 
-    private void actualizarPacienteActual(Paciente paciente) {
-        if (paciente != null) {
-            tvPacienteActual.setText("Paciente actual: " + paciente.getNombre() + " " + 
-                                   paciente.getApellido() + " (" + paciente.getCorreo() + ")");
-            // Precargar correo del paciente para facilitar más tratamientos
-            etCorreoPaciente.setText(paciente.getCorreo());
-        } else {
-            tvPacienteActual.setText("Paciente actual: No seleccionado");
-        }
-    }
+
 
     private void limpiarFormulario() {
         etCorreoPaciente.setText("");
+        limpiarFormularioExceptoCorreo();
+    }
+
+    private String extraerCorreo(String texto) {
+        // Busca el patrón (correo@dominio.com) y extrae solo el correo
+        int inicio = texto.lastIndexOf('(');
+        int fin = texto.lastIndexOf(')');
+        
+        if (inicio != -1 && fin != -1 && fin > inicio) {
+            return texto.substring(inicio + 1, fin);
+        }
+        
+        // Si no encuentra el formato, devuelve el texto tal cual (por si escribió el correo directamente)
+        return texto;
+    }
+
+    private void limpiarFormularioExceptoCorreo() {
         etNombreTratamiento.setText("");
         
         // Limpiar campos de medicación
@@ -326,7 +380,18 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
         llCamposCirugia.setVisibility(View.GONE);
         llCamposTerapia.setVisibility(View.GONE);
         
-        etCorreoPaciente.requestFocus();
+        etNombreTratamiento.requestFocus();
+    }
+
+    private void actualizarPacienteActual(Paciente paciente) {
+        if (paciente != null) {
+            tvPacienteActual.setText("Paciente actual: " + paciente.getNombre() + " " + 
+                                   paciente.getApellido() + " (" + paciente.getCorreo() + ")");
+            // Precargar correo del paciente para facilitar más tratamientos
+            etCorreoPaciente.setText(paciente.getCorreo());
+        } else {
+            tvPacienteActual.setText("Paciente actual: No seleccionado");
+        }
     }
 
     @Override

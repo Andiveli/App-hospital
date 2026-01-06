@@ -56,6 +56,8 @@ public class TratamientoPacienteViewModel extends AndroidViewModel {
         return pacienteActual;
     }
 
+
+
     // Métodos de carga de datos
     public void cargarTodos() {
         loading.setValue(true);
@@ -138,12 +140,12 @@ public class TratamientoPacienteViewModel extends AndroidViewModel {
     public void guardarTratamientoPaciente(String correoPaciente, String tipoTratamiento, 
                                           String nombre, String valor1, String valor2, String valor3) {
         if (correoPaciente == null || correoPaciente.trim().isEmpty()) {
-            mensaje.setValue("Debe ingresar el correo del paciente");
+            mensaje.postValue("Debe ingresar el correo del paciente");
             return;
         }
 
         if (nombre == null || nombre.trim().isEmpty()) {
-            mensaje.setValue("Debe ingresar el nombre del tratamiento");
+            mensaje.postValue("Debe ingresar el nombre del tratamiento");
             return;
         }
 
@@ -176,11 +178,11 @@ public class TratamientoPacienteViewModel extends AndroidViewModel {
 
                 mensaje.postValue("Tratamiento asignado exitosamente a " + paciente.getNombre() + " " + paciente.getApellido());
                 
-                // Recargar la lista según el filtro actual
-                if ("PACIENTE".equals(filtroActual)) {
-                    cargarPorPaciente(correoPaciente);
-                } else {
-                    cargarTodos();
+                // Actualizar la lista actual de forma más eficiente
+                List<TratamientoPaciente> listaActual = tratamientos.getValue();
+                if (listaActual != null) {
+                    listaActual.add(0, tp); // Agregar al principio
+                    tratamientos.postValue(listaActual);
                 }
 
             } catch (Exception e) {
@@ -226,13 +228,11 @@ public class TratamientoPacienteViewModel extends AndroidViewModel {
                 if (eliminado) {
                     mensaje.postValue("Tratamiento eliminado exitosamente");
                     
-                    // Recargar según el filtro actual
-                    if ("PACIENTE".equals(filtroActual) && pacienteActual.getValue() != null) {
-                        cargarPorPaciente(pacienteActual.getValue().getCorreo());
-                    } else if ("ESTADO".equals(filtroActual)) {
-                        cargarPorEstado(tratamiento.getEstado());
-                    } else {
-                        cargarTodos();
+                    // Actualizar la lista actual de forma más eficiente
+                    List<TratamientoPaciente> listaActual = tratamientos.getValue();
+                    if (listaActual != null) {
+                        listaActual.removeIf(tp -> tp.getId() == tratamiento.getId());
+                        tratamientos.postValue(listaActual);
                     }
                 } else {
                     mensaje.postValue("No se pudo eliminar el tratamiento");
@@ -250,13 +250,22 @@ public class TratamientoPacienteViewModel extends AndroidViewModel {
                 repository.guardar(tratamiento);
                 mensaje.postValue("Estado actualizado a: " + nuevoEstado);
                 
-                // Recargar la lista
-                if ("PACIENTE".equals(filtroActual) && pacienteActual.getValue() != null) {
-                    cargarPorPaciente(pacienteActual.getValue().getCorreo());
-                } else if ("ESTADO".equals(filtroActual)) {
-                    cargarPorEstado(nuevoEstado);
-                } else {
-                    cargarTodos();
+                // Actualizar la lista actual de forma más eficiente
+                List<TratamientoPaciente> listaActual = tratamientos.getValue();
+                if (listaActual != null) {
+                    // Si estamos filtrando por estado y cambiamos a un estado diferente, lo removemos
+                    if ("ESTADO".equals(filtroActual) && !tratamiento.getEstado().equals(nuevoEstado)) {
+                        listaActual.removeIf(tp -> tp.getId() == tratamiento.getId());
+                    } else {
+                        // Si no, simplemente actualizamos el estado
+                        for (TratamientoPaciente tp : listaActual) {
+                            if (tp.getId() == tratamiento.getId()) {
+                                tp.setEstado(nuevoEstado);
+                                break;
+                            }
+                        }
+                    }
+                    tratamientos.postValue(listaActual);
                 }
             } catch (Exception e) {
                 mensaje.postValue("Error al cambiar estado: " + e.getMessage());
