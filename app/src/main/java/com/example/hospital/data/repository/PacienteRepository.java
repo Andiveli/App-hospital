@@ -139,4 +139,32 @@ public class PacienteRepository {
     public boolean pacienteExiste(String correo) {
         return getPacientePorCorreo(correo).isPresent();
     }
+
+    public Paciente buscarPorCorreo(String correo) {
+        return getPacientePorCorreo(correo).orElse(null);
+    }
+
+    public boolean guardarPaciente(String nombre, String apellido, String correo, String cedula, com.example.hospital.data.models.TipoSeguro tipoSeguro) {
+        // Verificar si ya existe
+        if (pacienteExiste(correo)) {
+            // Si ya existe, actualizamos
+            Optional<Paciente> existente = getPacientePorCorreo(correo);
+            if (existente.isPresent()) {
+                Paciente paciente = existente.get();
+                paciente.setNombre(nombre);
+                paciente.setApellido(apellido);
+                paciente.setCedulaString(cedula);
+                paciente.setTipoSeguro(tipoSeguro);
+                return actualizarPaciente(paciente);
+            }
+            return false;
+        }
+
+        // Crear nuevo paciente
+        int nuevoId = pacientesCache.size() + 1;
+        Paciente nuevoPaciente = new Paciente(nuevoId, nombre, apellido, correo, cedula, tipoSeguro);
+        
+        pacientesCache.add(nuevoPaciente);
+        return guardarCambios();
+    }
 }

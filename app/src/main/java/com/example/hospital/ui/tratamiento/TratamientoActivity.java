@@ -1,15 +1,13 @@
 package com.example.hospital.ui.tratamiento;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,11 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hospital.MainActivity;
 import com.example.hospital.R;
-import com.example.hospital.data.models.Cirugia;
-import com.example.hospital.data.models.Medicacion;
-import com.example.hospital.data.models.Terapia;
-import com.example.hospital.data.models.Tratamiento;
-import com.example.hospital.viewmodel.TratamientoViewModel;
+import com.example.hospital.data.models.Paciente;
+import com.example.hospital.data.models.TratamientoPaciente;
+import com.example.hospital.viewmodel.TratamientoPacienteViewModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -33,19 +29,25 @@ import java.util.List;
 public class TratamientoActivity extends AppCompatActivity implements TratamientoAdapter.OnTratamientoClickListener {
 
     // UI Components
-    private TextInputEditText etNombre;
-    private TextInputEditText etDuracion;
-    private TextInputEditText etPrecio;
-    private Spinner spTipo;
+    private TextInputEditText etCorreoPaciente;
+    private TextInputEditText etNombreTratamiento;
+    private TextInputEditText etCostoUnidad, etVecesDia, etDias;
+    private TextInputEditText etCostoCirugia;
+    private TextInputEditText etCostoSesion, etNumeroSesiones;
+    private RadioGroup rgTipoTratamiento;
     private RecyclerView rvTratamientos;
     private ProgressBar progressBar;
-    private TextView tvMensaje;
+    private TextView tvMensaje, tvPacienteActual;
+
+    // Layouts dinámicos
+    private LinearLayout llCamposMedicacion, llCamposCirugia, llCamposTerapia;
 
     // Botones de filtro
-    private Button btnTodos, btnCirugias, btnMedicaciones, btnTerapias, btnBuscar;
+    private Button btnTodos, btnActivos, btnCompletados, btnBuscar;
+    private Button btnFiltroActivo;
 
     // ViewModel y Adapter
-    private TratamientoViewModel tratamientoViewModel;
+    private TratamientoPacienteViewModel tratamientoViewModel;
     private TratamientoAdapter tratamientoAdapter;
 
     @Override
@@ -56,33 +58,55 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
         initViews();
         setupViewModel();
         setupRecyclerView();
-        setupSpinner();
         setupClickListeners();
+        setupTipoTratamientoListener();
+        
+        // Cargar todos los tratamientos al iniciar
+        tratamientoViewModel.cargarTodos();
     }
 
     private void initViews() {
-        etNombre = findViewById(R.id.etNombre);
-        etDuracion = findViewById(R.id.etDuracion);
-        etPrecio = findViewById(R.id.etPrecio);
-        spTipo = findViewById(R.id.spTipo);
+        etCorreoPaciente = findViewById(R.id.etCorreoPaciente);
+        etNombreTratamiento = findViewById(R.id.etNombreTratamiento);
+        
+        // Campos para medicación
+        etCostoUnidad = findViewById(R.id.etCostoUnidad);
+        etVecesDia = findViewById(R.id.etVecesDia);
+        etDias = findViewById(R.id.etDias);
+        
+        // Campos para cirugía
+        etCostoCirugia = findViewById(R.id.etCostoCirugia);
+        
+        // Campos para terapia
+        etCostoSesion = findViewById(R.id.etCostoSesion);
+        etNumeroSesiones = findViewById(R.id.etNumeroSesiones);
+        
+        rgTipoTratamiento = findViewById(R.id.rgTipoTratamiento);
         rvTratamientos = findViewById(R.id.rvTratamientos);
         progressBar = findViewById(R.id.progressBar);
+        tvMensaje = findViewById(R.id.tvMensaje);
+        tvPacienteActual = findViewById(R.id.tvPacienteActual);
+
+        // Layouts dinámicos
+        llCamposMedicacion = findViewById(R.id.llCamposMedicacion);
+        llCamposCirugia = findViewById(R.id.llCamposCirugia);
+        llCamposTerapia = findViewById(R.id.llCamposTerapia);
 
         // Botones de filtro
         btnTodos = findViewById(R.id.btnTodos);
-        btnCirugias = findViewById(R.id.btnCirugias);
-        btnMedicaciones = findViewById(R.id.btnMedicaciones);
-        btnTerapias = findViewById(R.id.btnTerapias);
+        btnActivos = findViewById(R.id.btnActivos);
+        btnCompletados = findViewById(R.id.btnCompletados);
         btnBuscar = findViewById(R.id.btnBuscar);
     }
 
     private void setupViewModel() {
-        tratamientoViewModel = new ViewModelProvider(this).get(TratamientoViewModel.class);
+        tratamientoViewModel = new ViewModelProvider(this).get(TratamientoPacienteViewModel.class);
 
         // Observar LiveData
         tratamientoViewModel.getTratamientos().observe(this, this::actualizarListaTratamientos);
         tratamientoViewModel.getMensaje().observe(this, this::mostrarMensaje);
         tratamientoViewModel.getLoading().observe(this, this::mostrarLoading);
+        tratamientoViewModel.getPacienteActual().observe(this, this::actualizarPacienteActual);
     }
 
     private void setupRecyclerView() {
@@ -91,36 +115,6 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
 
         rvTratamientos.setLayoutManager(new LinearLayoutManager(this));
         rvTratamientos.setAdapter(tratamientoAdapter);
-    }
-
-    private void setupSpinner() {
-        // Spinner de tipos de tratamiento
-        String[] tipos = {"Cirugía", "Medicación", "Terapia"};
-        ArrayAdapter<String> tiposAdapter = new ArrayAdapter<>(this, 
-            android.R.layout.simple_spinner_item, tipos);
-        tiposAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spTipo.setAdapter(tiposAdapter);
-
-        // Configurar listener para ajustar labels según el tipo
-        spTipo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                actualizarLabelsSegunTipo(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // No hacer nada
-            }
-        });
-    }
-
-    private void actualizarLabelsSegunTipo(int posicion) {
-        String[] tipoDias = {"horas", "días", "sesiones"};
-        String[] tipoPrecio = {"por hora", "por día", "por sesión"};
-        
-        // Aquí podrías actualizar los hint de los campos si quisieras
-        // pero por ahora lo dejo como está
     }
 
     private void setupClickListeners() {
@@ -132,78 +126,58 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
 
         // Botones de filtro
         btnTodos.setOnClickListener(v -> {
-            tratamientoViewModel.cargarTratamientos();
+            tratamientoViewModel.cargarTodos();
             actualizarBotonActivo(btnTodos);
         });
 
-        btnCirugias.setOnClickListener(v -> {
-            tratamientoViewModel.cargarCirugias();
-            actualizarBotonActivo(btnCirugias);
+        btnActivos.setOnClickListener(v -> {
+            tratamientoViewModel.cargarPorEstado("ACTIVO");
+            actualizarBotonActivo(btnActivos);
         });
 
-        btnMedicaciones.setOnClickListener(v -> {
-            tratamientoViewModel.cargarMedicaciones();
-            actualizarBotonActivo(btnMedicaciones);
-        });
-
-        btnTerapias.setOnClickListener(v -> {
-            tratamientoViewModel.cargarTerapias();
-            actualizarBotonActivo(btnTerapias);
+        btnCompletados.setOnClickListener(v -> {
+            tratamientoViewModel.cargarPorEstado("COMPLETADO");
+            actualizarBotonActivo(btnCompletados);
         });
 
         btnBuscar.setOnClickListener(v -> mostrarDialogoBusqueda());
-
-        // Botones de estadísticas
-        findViewById(R.id.btnEstadisticas).setOnClickListener(v -> mostrarEstadisticas());
 
         // Establecer botón "Todos" como activo por defecto
         actualizarBotonActivo(btnTodos);
     }
 
+    private void setupTipoTratamientoListener() {
+        rgTipoTratamiento.setOnCheckedChangeListener((group, checkedId) -> {
+            // Ocultar todos los campos específicos
+            llCamposMedicacion.setVisibility(View.GONE);
+            llCamposCirugia.setVisibility(View.GONE);
+            llCamposTerapia.setVisibility(View.GONE);
+
+            // Mostrar campos según el tipo seleccionado
+            if (checkedId == R.id.rbMedicacion) {
+                llCamposMedicacion.setVisibility(View.VISIBLE);
+            } else if (checkedId == R.id.rbCirugia) {
+                llCamposCirugia.setVisibility(View.VISIBLE);
+            } else if (checkedId == R.id.rbTerapia) {
+                llCamposTerapia.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
     private void mostrarDialogoBusqueda() {
-        View view = getLayoutInflater().inflate(R.layout.dialog_busqueda_tratamiento, null);
+        View view = getLayoutInflater().inflate(R.layout.dialog_busqueda, null);
 
-        Spinner spCampo = view.findViewById(R.id.spCampoBusqueda);
+        RadioGroup rgCampo = view.findViewById(R.id.rgCampoBusqueda);
         TextInputEditText etTermino = view.findViewById(R.id.etTerminoBusqueda);
-
-        // Configurar spinner de campos
-        String[] campos = {"Nombre", "Precio máximo", "Duración máxima"};
-        ArrayAdapter<String> camposAdapter = new ArrayAdapter<>(this, 
-            android.R.layout.simple_spinner_item, campos);
-        camposAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spCampo.setAdapter(camposAdapter);
 
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Buscar Tratamientos")
                 .setView(view)
                 .setPositiveButton("Buscar", (dialog, which) -> {
                     String termino = etTermino.getText().toString().trim();
-                    String campo = (String) spCampo.getSelectedItem();
 
                     if (!TextUtils.isEmpty(termino)) {
-                        switch (campo) {
-                            case "Nombre":
-                                tratamientoViewModel.buscarTratamientos(termino);
-                                break;
-                            case "Precio máximo":
-                                try {
-                                    double precio = Double.parseDouble(termino);
-                                    tratamientoViewModel.filtrarPorPrecioMaximo(precio);
-                                } catch (NumberFormatException e) {
-                                    Toast.makeText(this, "Ingrese un precio válido", Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                                break;
-                            case "Duración máxima":
-                                try {
-                                    int duracion = Integer.parseInt(termino);
-                                    tratamientoViewModel.filtrarPorDuracionMaxima(duracion);
-                                } catch (NumberFormatException e) {
-                                    Toast.makeText(this, "Ingrese una duración válida", Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                                break;
-                        }
+                        tratamientoViewModel.buscarTratamientos(termino);
                         actualizarBotonActivo(btnBuscar);
                     } else {
                         Toast.makeText(this, "Ingrese un término de búsqueda", Toast.LENGTH_SHORT).show();
@@ -213,35 +187,11 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
                 .show();
     }
 
-    private void mostrarEstadisticas() {
-        int total = tratamientoViewModel.getTotalTratamientos();
-        double promedio = tratamientoViewModel.getCostoPromedio();
-        Tratamiento masCaro = tratamientoViewModel.getTratamientoMasCaro();
-
-        StringBuilder stats = new StringBuilder();
-        stats.append("📊 ESTADÍSTICAS DE TRATAMIENTOS\n\n");
-        stats.append("📋 Total de tratamientos: ").append(total).append("\n");
-        stats.append("💰 Costo promedio: $").append(String.format("%.2f", promedio)).append("\n");
-        
-        if (masCaro != null) {
-            stats.append("💎 Tratamiento más caro:\n");
-            stats.append("   ").append(masCaro.getNombre()).append("\n");
-            stats.append("   Costo: $").append(String.format("%.2f", masCaro.calcularCosto()));
-        }
-
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Estadísticas")
-                .setMessage(stats.toString())
-                .setPositiveButton("OK", null)
-                .show();
-    }
-
     private void actualizarBotonActivo(Button botonActivo) {
         // Resetear todos los botones a estilo outline
         btnTodos.setBackgroundColor(getResources().getColor(android.R.color.transparent, getTheme()));
-        btnCirugias.setBackgroundColor(getResources().getColor(android.R.color.transparent, getTheme()));
-        btnMedicaciones.setBackgroundColor(getResources().getColor(android.R.color.transparent, getTheme()));
-        btnTerapias.setBackgroundColor(getResources().getColor(android.R.color.transparent, getTheme()));
+        btnActivos.setBackgroundColor(getResources().getColor(android.R.color.transparent, getTheme()));
+        btnCompletados.setBackgroundColor(getResources().getColor(android.R.color.transparent, getTheme()));
         btnBuscar.setBackgroundColor(getResources().getColor(android.R.color.transparent, getTheme()));
 
         // Resaltar botón activo
@@ -249,32 +199,69 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
     }
 
     private void guardarTratamiento() {
-        String nombre = etNombre.getText().toString().trim();
-        String duracionStr = etDuracion.getText().toString().trim();
-        String precioStr = etPrecio.getText().toString().trim();
-        String tipo = (String) spTipo.getSelectedItem();
-
+        String correoPaciente = etCorreoPaciente.getText().toString().trim();
+        String nombre = etNombreTratamiento.getText().toString().trim();
+        
         // Validaciones básicas
+        if (TextUtils.isEmpty(correoPaciente)) {
+            Toast.makeText(this, "Ingrese el correo del paciente", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (TextUtils.isEmpty(nombre)) {
             Toast.makeText(this, "Ingrese el nombre del tratamiento", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (TextUtils.isEmpty(duracionStr)) {
-            Toast.makeText(this, "Ingrese la duración", Toast.LENGTH_SHORT).show();
+        // Validar que se haya seleccionado un tipo de tratamiento
+        int selectedId = rgTipoTratamiento.getCheckedRadioButtonId();
+        if (selectedId == -1) {
+            Toast.makeText(this, "Seleccione el tipo de tratamiento", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (TextUtils.isEmpty(precioStr)) {
-            Toast.makeText(this, "Ingrese el precio", Toast.LENGTH_SHORT).show();
-            return;
+        // Obtener valores según el tipo de tratamiento
+        String tipoTratamiento = "";
+        String valor1 = "", valor2 = "", valor3 = "";
+        boolean camposValidos = true;
+
+        if (selectedId == R.id.rbMedicacion) {
+            tipoTratamiento = "MEDICACIÓN";
+            valor1 = etCostoUnidad.getText().toString().trim(); // costo unidad
+            valor2 = etVecesDia.getText().toString().trim();    // veces al día
+            valor3 = etDias.getText().toString().trim();         // días
+            
+            if (TextUtils.isEmpty(valor1) || TextUtils.isEmpty(valor2) || TextUtils.isEmpty(valor3)) {
+                Toast.makeText(this, "Complete todos los campos de la medicación", Toast.LENGTH_SHORT).show();
+                camposValidos = false;
+            }
+        } else if (selectedId == R.id.rbCirugia) {
+            tipoTratamiento = "CIRUGÍA";
+            valor1 = etCostoCirugia.getText().toString().trim(); // costo total
+            
+            if (TextUtils.isEmpty(valor1)) {
+                Toast.makeText(this, "Ingrese el costo de la cirugía", Toast.LENGTH_SHORT).show();
+                camposValidos = false;
+            }
+        } else if (selectedId == R.id.rbTerapia) {
+            tipoTratamiento = "TERAPIA";
+            valor1 = etCostoSesion.getText().toString().trim();    // costo sesión
+            valor2 = etNumeroSesiones.getText().toString().trim(); // número de sesiones
+            
+            if (TextUtils.isEmpty(valor1) || TextUtils.isEmpty(valor2)) {
+                Toast.makeText(this, "Complete todos los campos de la terapia", Toast.LENGTH_SHORT).show();
+                camposValidos = false;
+            }
         }
 
-        tratamientoViewModel.guardarTratamiento(nombre, duracionStr, precioStr, tipo, false);
+        if (camposValidos) {
+            tratamientoViewModel.guardarTratamientoPaciente(correoPaciente, tipoTratamiento, 
+                                                           nombre, valor1, valor2, valor3);
+        }
     }
 
-    private void actualizarListaTratamientos(List<Tratamiento> tratamientos) {
-        tratamientoAdapter.actualizarTratamientos(tratamientos);
+    private void actualizarListaTratamientos(List<TratamientoPaciente> tratamientos) {
+        tratamientoAdapter.actualizarTratamientosPaciente(tratamientos);
     }
 
     private void mostrarMensaje(String mensaje) {
@@ -292,7 +279,7 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
             Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
 
             // Si es un mensaje de éxito, limpiar formulario
-            if (mensaje.contains("guardado exitosamente") || mensaje.contains("eliminado exitosamente")) {
+            if (mensaje.contains("asignado exitosamente")) {
                 limpiarFormulario();
             }
         }
@@ -304,78 +291,117 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
         }
     }
 
-    private void limpiarFormulario() {
-        etNombre.setText("");
-        etDuracion.setText("");
-        etPrecio.setText("");
-        spTipo.setSelection(0);
-        etNombre.requestFocus(); // Poner foco en el primer campo
-    }
-
-    @Override
-    public void onTratamientoClick(Tratamiento tratamiento) {
-        // Cargar datos del tratamiento para edición
-        etNombre.setText(tratamiento.getNombre());
-        etDuracion.setText(String.valueOf(tratamiento.getDuracion()));
-        etPrecio.setText(String.valueOf(tratamiento.getPrecio()));
-
-        // Seleccionar tipo según el tipo de tratamiento
-        if (tratamiento instanceof Cirugia) {
-            spTipo.setSelection(0); // "Cirugía"
-        } else if (tratamiento instanceof Medicacion) {
-            spTipo.setSelection(1); // "Medicación"
-        } else if (tratamiento instanceof Terapia) {
-            spTipo.setSelection(2); // "Terapia"
+    private void actualizarPacienteActual(Paciente paciente) {
+        if (paciente != null) {
+            tvPacienteActual.setText("Paciente actual: " + paciente.getNombre() + " " + 
+                                   paciente.getApellido() + " (" + paciente.getCorreo() + ")");
+            // Precargar correo del paciente para facilitar más tratamientos
+            etCorreoPaciente.setText(paciente.getCorreo());
+        } else {
+            tvPacienteActual.setText("Paciente actual: No seleccionado");
         }
+    }
 
-        tratamientoViewModel.setTratamientoActual(tratamiento);
-        Toast.makeText(this, "Tratamiento seleccionado: " + tratamiento.getNombre(), Toast.LENGTH_SHORT).show();
+    private void limpiarFormulario() {
+        etCorreoPaciente.setText("");
+        etNombreTratamiento.setText("");
+        
+        // Limpiar campos de medicación
+        etCostoUnidad.setText("");
+        etVecesDia.setText("");
+        etDias.setText("");
+        
+        // Limpiar campos de cirugía
+        etCostoCirugia.setText("");
+        
+        // Limpiar campos de terapia
+        etCostoSesion.setText("");
+        etNumeroSesiones.setText("");
+        
+        // Resetear tipo de tratamiento
+        rgTipoTratamiento.clearCheck();
+        
+        // Ocultar todos los campos específicos
+        llCamposMedicacion.setVisibility(View.GONE);
+        llCamposCirugia.setVisibility(View.GONE);
+        llCamposTerapia.setVisibility(View.GONE);
+        
+        etCorreoPaciente.requestFocus();
     }
 
     @Override
-    public void onTratamientoDelete(Tratamiento tratamiento) {
-        // Mostrar confirmación antes de eliminar
+    public void onTratamientoClick(TratamientoPaciente tratamiento) {
+        // Cargar correo del paciente para facilitar más tratamientos
+        etCorreoPaciente.setText(tratamiento.getPaciente().getCorreo());
+        
+        // Mostrar detalles del tratamiento
+        StringBuilder detalles = new StringBuilder();
+        detalles.append("📋 TRATAMIENTO SELECCIONADO\n\n");
+        detalles.append("👤 Paciente: ").append(tratamiento.getPaciente().getNombre())
+                .append(" ").append(tratamiento.getPaciente().getApellido()).append("\n");
+        detalles.append("📧 Correo: ").append(tratamiento.getPaciente().getCorreo()).append("\n");
+        detalles.append("💊 Tratamiento: ").append(tratamiento.getTratamiento().getNombre()).append("\n");
+        detalles.append("🏷️ Tipo: ").append(tratamiento.getTratamiento().getTipo()).append("\n");
+        detalles.append("📅 Fecha asignación: ").append(tratamiento.getFechaFormateada()).append("\n");
+        detalles.append("📊 Estado: ").append(tratamiento.getEstado()).append("\n");
+        detalles.append("💰 Costo total: $").append(String.format("%.2f", tratamiento.getCostoTotal())).append("\n\n");
+        
+        detalles.append("📝 Detalles del tratamiento:\n");
+        detalles.append(tratamiento.getDetallesTratamiento());
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Detalles del Tratamiento")
+                .setMessage(detalles.toString())
+                .setPositiveButton("OK", null)
+                .setNeutralButton("Cambiar Estado", (dialog, which) -> mostrarDialogoCambiarEstado(tratamiento))
+                .show();
+    }
+
+    @Override
+    public void onTratamientoDelete(TratamientoPaciente tratamiento) {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Eliminar Tratamiento")
-                .setMessage("¿Está seguro que desea eliminar el tratamiento: " + tratamiento.getNombre() + "?")
+                .setMessage("¿Está seguro que desea eliminar este tratamiento?\n\n" +
+                           "Paciente: " + tratamiento.getPaciente().getNombre() + " " + tratamiento.getPaciente().getApellido() + "\n" +
+                           "Tratamiento: " + tratamiento.getTratamiento().getNombre())
                 .setPositiveButton("Eliminar", (dialog, which) -> {
-                    tratamientoViewModel.eliminarTratamiento(tratamiento);
+                    tratamientoViewModel.eliminarTratamientoPaciente(tratamiento);
                 })
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
 
     @Override
-    public void onTratamientoShowCost(Tratamiento tratamiento) {
-        double costo = tratamiento.calcularCosto();
-        String mensaje = "Costo total del tratamiento:\n\n";
-        mensaje += "📋 " + tratamiento.getNombre() + "\n";
-        mensaje += "⏰ Duración: " + tratamiento.getDuracion();
+    public void onTratamientoShowCost(TratamientoPaciente tratamiento) {
+        onTratamientoClick(tratamiento); // Reutilizar el mismo método para mostrar detalles
+    }
+
+    private void mostrarDialogoCambiarEstado(TratamientoPaciente tratamiento) {
+        String[] estados = {"ACTIVO", "COMPLETADO", "CANCELADO"};
+        int currentIndex = 0;
         
-        // Agregar etiqueta específica según tipo
-        if (tratamiento instanceof Cirugia) {
-            mensaje += " horas\n";
-        } else if (tratamiento instanceof Medicacion) {
-            mensaje += " días\n";
-        } else if (tratamiento instanceof Terapia) {
-            mensaje += " sesiones\n";
+        // Encontrar el índice del estado actual
+        for (int i = 0; i < estados.length; i++) {
+            if (estados[i].equals(tratamiento.getEstado())) {
+                currentIndex = i;
+                break;
+            }
         }
-        
-        mensaje += "💰 Costo base: $" + com.example.hospital.data.models.Tratamiento.getCostoBase() + "\n";
-        mensaje += "💵 Precio unitario: $" + tratamiento.getPrecio() + "\n";
-        mensaje += "💳 Costo total: $" + String.format("%.2f", costo);
 
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Calcular Costo")
-                .setMessage(mensaje)
-                .setPositiveButton("OK", null)
+                .setTitle("Cambiar Estado")
+                .setSingleChoiceItems(estados, currentIndex, (dialog, which) -> {
+                    String nuevoEstado = estados[which];
+                    tratamientoViewModel.cambiarEstadoTratamiento(tratamiento, nuevoEstado);
+                    dialog.dismiss();
+                })
+                .setNegativeButton("Cancelar", null)
                 .show();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        // Volver al menú principal
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }
