@@ -95,7 +95,6 @@ public class TratamientoActivity extends AppCompatActivity implements Tratamient
         rvTratamientos = findViewById(R.id.rvTratamientos);
         progressBar = findViewById(R.id.progressBar);
         tvMensaje = findViewById(R.id.tvMensaje);
-        tvPacienteActual = findViewById(R.id.tvPacienteActual);
 
         // Layouts dinámicos
         llCamposMedicacion = findViewById(R.id.llCamposMedicacion);

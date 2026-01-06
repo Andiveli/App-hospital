@@ -25,20 +25,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Información del paciente actual -->
-        <TextView
-            android:id="@+id/tvPacienteActual"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Paciente actual: No seleccionado"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:background="#E3F2FD"
-            android:padding="8dp"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+
 
         <!-- Formulario -->
         <TextView
@@ -49,7 +36,7 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginBottom="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tvPacienteActual"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
